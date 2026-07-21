@@ -44,9 +44,9 @@ Supplied photography is stored in `public/images/leadership`. The three `Gemini_
 
 Keep filenames stable or update their references in `app/Site.tsx`. Compress new photographs before publishing, preserve natural proportions, and use descriptive alternative text. See `IMAGE-REPLACEMENT-GUIDE.md`.
 
-## Languages
+## Language
 
-The EN / नेपाली control is functional and stores the choice locally. English remains the approved source. Nepali intentionally shows a translation-pending notice instead of an automated translation. Add approved translations as structured locale objects and map the existing content keys; never machine-publish unreviewed legal or investment language.
+The public website is English-only. If a Nepali edition is approved later, add reviewed translations as a separate locale architecture; never machine-publish unreviewed legal or investment language.
 
 ## Forms
 
