@@ -61,12 +61,13 @@ export async function POST(request: Request) {
 
     const user = process.env.SMTP_USER || "inquiry@kisanimpactfund.com";
     const pass = process.env.SMTP_PASS || "@@inquiry@@impact";
-    const primaryHost = process.env.SMTP_HOST || "mail.kisanimpactfund.com";
+    const primaryHost = process.env.SMTP_HOST || "s11638.sgp1.stableserver.net";
     const port = Number(process.env.SMTP_PORT) || 465;
 
-    // List of candidate SMTP configurations to attempt (Primary -> Localhost)
+    // Candidates: 1) s11638.sgp1.stableserver.net:465, 2) mail.kisanimpactfund.com:465, 3) 127.0.0.1:465
     const configs = [
       { host: primaryHost, port: port, secure: port === 465 },
+      { host: "mail.kisanimpactfund.com", port: port, secure: port === 465 },
       { host: "127.0.0.1", port: port, secure: port === 465 },
       { host: "127.0.0.1", port: 25, secure: false },
     ];
@@ -81,9 +82,9 @@ export async function POST(request: Request) {
           port: config.port,
           secure: config.secure,
           auth: { user, pass },
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 12000,
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 15000,
           tls: { rejectUnauthorized: false },
         });
 
