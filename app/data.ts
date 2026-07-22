@@ -1,14 +1,14 @@
 export type Venture = { name:string; sector:string; status:string; problem:string; solution:string; benefit:string; focus:string };
 export const stats = [
-  ["1.5M","farmer households targeted"],["49%","farmer ownership target"],["378,500","farmer records collected"],
+  ["1.5M","farmer households targeted"],["49%","farmer ownership target"],["13,61,750","farmer records collected"],
   ["4–6","scalable ventures in five years"],["30%","targeted household income improvement"],["5–7 yrs","IPO ambition"]
 ];
 export const leaders = [
-  ["Mr. Keshav Sthapit","Chairman","Keshav Sthapit.png"],["Mr. Surya Bhusal","Board Member","surya bhusal.jpeg"],
-  ["Mr. Minraj Kadel","Board Member","Mr Minraj Kandel.jpg"],["Mr. Keshav Lal Shrestha","Board Member","Keshav Lal Shrestha.jpeg"],
-  ["Mrs. Shobha Gyawali","Board Member","sobha gyawali.jpg"],["Mr. Mahesh Gyawali","Board Member","Mahesh Gyawali.png"],
-  ["Mr. Keshav Sarawagi","Board Member","Mr Keshav Sarawagi.png"],["Mr. Bal Kumar Thapaliya","Board Member","Mr Bal Kumar Thapaliya.jpg"],
-  ["Mrs. Bhagwati Choudhary","Board Member","Mrs . Bhagwati Choudhary.png"],["Mr. Lal Prasad Sanwa Limbu","Advisor","Mr . Lal Prasad Sanwa Limbu.jpg"]
+  ["Mr. Keshav Sthapit","Chairman","Keshav Sthapit.png"],["Mrs. Bhagwati Choudhary","Board Member","Mrs . Bhagwati Choudhary.png"],
+  ["Mr. Surya Bhusal","Board Member","surya bhusal.jpeg"],["Mr. Minraj Kadel","Board Member","Mr Minraj Kandel.jpg"],
+  ["Mr. Keshav Lal Shrestha","Board Member","Keshav Lal Shrestha.jpeg"],["Mrs. Shobha Gyawali","Board Member","sobha gyawali.jpg"],
+  ["Mr. Mahesh Gyawali","Board Member","Mahesh Gyawali.png"],["Mr. Keshav Sarawagi","Board Member","Mr Keshav Sarawagi.png"],
+  ["Mr. Bal Kumar Thapaliya","Board Member","Mr Bal Kumar Thapaliya.jpg"],["Mr. Lal Prasad Sanwa Limbu","Advisor","Mr . Lal Prasad Sanwa Limbu.jpg"]
 ];
 export const ventures: Venture[] = [
   {name:"Kisan Net",sector:"Digital Infrastructure",status:"Flagship",problem:"Rural communities face uneven access to reliable connectivity and digital services.",solution:"An integrated FTTH, wireless broadband and farmer-focused digital platform.",benefit:"Market information, telehealth, e-commerce, financial inclusion and agri-tech access.",focus:"Phased national expansion"},
