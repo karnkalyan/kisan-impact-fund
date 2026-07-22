@@ -61,14 +61,14 @@ export async function POST(request: Request) {
 
     const user = process.env.SMTP_USER || "inquiry@kisanimpactfund.com";
     const pass = process.env.SMTP_PASS || "@@inquiry@@impact";
-    const primaryHost = process.env.SMTP_HOST || "s11638.sgp1.stableserver.net";
-    const port = Number(process.env.SMTP_PORT) || 465;
 
-    // Candidates: 1) s11638.sgp1.stableserver.net:465, 2) mail.kisanimpactfund.com:465, 3) 127.0.0.1:465
+    // Candidate SMTP configurations to try in sequence
     const configs = [
-      { host: primaryHost, port: port, secure: port === 465 },
-      { host: "mail.kisanimpactfund.com", port: port, secure: port === 465 },
-      { host: "127.0.0.1", port: port, secure: port === 465 },
+      { host: process.env.SMTP_HOST || "s11638.sgp1.stableserver.net", port: 587, secure: false },
+      { host: process.env.SMTP_HOST || "s11638.sgp1.stableserver.net", port: 465, secure: true },
+      { host: "mail.kisanimpactfund.com", port: 587, secure: false },
+      { host: "mail.kisanimpactfund.com", port: 465, secure: true },
+      { host: "127.0.0.1", port: 587, secure: false },
       { host: "127.0.0.1", port: 25, secure: false },
     ];
 
@@ -82,9 +82,9 @@ export async function POST(request: Request) {
           port: config.port,
           secure: config.secure,
           auth: { user, pass },
-          connectionTimeout: 10000,
-          greetingTimeout: 10000,
-          socketTimeout: 15000,
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 10000,
           tls: { rejectUnauthorized: false },
         });
 
@@ -97,6 +97,7 @@ export async function POST(request: Request) {
         });
 
         sent = true;
+        console.log(`Email sent successfully via ${config.host}:${config.port}`);
         break;
       } catch (err: any) {
         console.warn(`SMTP send attempt failed for ${config.host}:${config.port}:`, err?.message);
