@@ -87,7 +87,7 @@ function Form({ farmer = false }: { farmer?: boolean }) {
         <div className="success">
           <Sprout />
           <h3>Thank you — your enquiry has been submitted successfully.</h3>
-          <p>Our team will review your enquiry and get back to you shortly at info@kisanimpactfund.com.</p>
+          <p>Our team will review your enquiry and get back to you shortly from inquiry@kisanimpactfund.com.</p>
           <button type="button" onClick={() => setDone(false)}>Submit another response</button>
         </div>
       ) : (
