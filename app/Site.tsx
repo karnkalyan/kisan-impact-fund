@@ -10,7 +10,7 @@ const href = (n: string) => n === "Home" ? "/" : "/" + n.toLowerCase().replaceAl
 const copy = {
   home: ["Farmer Owned Impact Investment Platform", "Building a Farmer Owned Digital Economy", "Kisan Impact Fund invests in scalable businesses that connect Nepali farmers with technology, markets, financial services, infrastructure, and long-term ownership."],
   about: ["About Kisan Impact Fund", "Investment Built Around Farmer Ownership", "A Nepal-based investment and holding company modernizing agriculture through inclusive ownership, disciplined capital and technology."],
-  "investment-model": ["Our Investment Model", "Farmers Are Customers — and Owners", "A proposed ownership model aligning farmers, strategic expertise and patient capital around long-term value creation."],
+  "investment-model": ["Our Investment Model", "Farmers Are Customers and Owners", "A proposed ownership model aligning farmers, strategic expertise and patient capital around long-term value creation."],
   portfolio: ["Our Portfolio", "Investing Across the Farmer Economy", "A transparent view of flagship, planned and evaluated opportunities across the agricultural value chain."],
   impact: ["Impact & ESG", "Measuring Value Beyond Financial Returns", "A practical framework for tracking income, ownership, access, inclusion, resilience and governance."],
   farmers: ["For Farmers", "From Service Users to Business Owners", "A proposed pathway for eligible farmers and farmer groups to participate in services, governance and long-term ownership."],
@@ -47,6 +47,7 @@ function Form({ farmer = false }: { farmer?: boolean }) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setErrorMsg("");
 
@@ -62,14 +63,19 @@ function Form({ farmer = false }: { farmer?: boolean }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      const result = await res.json();
-      if (result.success) {
+      let result: any = {};
+      try {
+        result = await res.json();
+      } catch {
+        result = { error: `Server response error (${res.status}). Please check SMTP setup.` };
+      }
+      if (res.ok && result.success) {
         setDone(true);
       } else {
         setErrorMsg(result.error || "Failed to submit enquiry. Please try again.");
       }
     } catch (err: any) {
-      setErrorMsg("Network error. Please try again.");
+      setErrorMsg(err?.message || "Network error. Please check connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -91,32 +97,43 @@ function Form({ farmer = false }: { farmer?: boolean }) {
               {errorMsg}
             </div>
           )}
-          <div className="form-grid">
-            <label>Full name<input required name="name" /></label>
-            {!farmer && <label>Organization<input name="org" /></label>}
-            <label>{farmer ? "Mobile number" : "Email"}<input required name={farmer ? "mobile" : "email"} type={farmer ? "tel" : "email"} /></label>
-            <label>{farmer ? "Province" : "Phone"}<input required={farmer} name={farmer ? "province" : "phone"} /></label>
-            {farmer ? (
-              <>
-                <label>District<input required name="district" /></label>
-                <label>Municipality<input required name="municipality" /></label>
-                <label>Cooperative or farmer group<input name="cooperative" /></label>
-                <label>Main farming activity<input name="activity" /></label>
-                <label>Preferred language<select name="language"><option>English</option><option>नेपाली</option></select></label>
-              </>
-            ) : (
-              <>
-                <label>Enquiry type<select required name="enquiryType"><option value="">Select</option><option>Strategic Investment</option><option>Institutional Partnership</option><option>Farmer Registration</option><option>Portfolio Proposal</option><option>Media Enquiry</option><option>General Contact</option></select></label>
-                <label>Subject<input required name="subject" /></label>
-                <label className="wide">Message<textarea required name="message" rows={5} /></label>
-              </>
-            )}
-          </div>
-          <label className="consent"><input type="checkbox" required /> I consent to being contacted about this enquiry.</label>
-          <button className="button" type="submit" disabled={loading}>
-            {loading ? "Sending Enquiry..." : "Send Enquiry"} <ArrowRight />
-          </button>
-          <p className="note">Your information is transmitted securely and handled with strict confidentiality.</p>
+          <fieldset disabled={loading} style={{ border: 0, padding: 0, margin: 0 }}>
+            <div className="form-grid">
+              <label>Full name<input required name="name" disabled={loading} /></label>
+              {!farmer && <label>Organization<input name="org" disabled={loading} /></label>}
+              <label>{farmer ? "Mobile number" : "Email"}<input required name={farmer ? "mobile" : "email"} type={farmer ? "tel" : "email"} disabled={loading} /></label>
+              <label>{farmer ? "Province" : "Phone"}<input required={farmer} name={farmer ? "province" : "phone"} disabled={loading} /></label>
+              {farmer ? (
+                <>
+                  <label>District<input required name="district" disabled={loading} /></label>
+                  <label>Municipality<input required name="municipality" disabled={loading} /></label>
+                  <label>Cooperative or farmer group<input name="cooperative" disabled={loading} /></label>
+                  <label>Main farming activity<input name="activity" disabled={loading} /></label>
+                  <label>Preferred language<select name="language" disabled={loading}><option>English</option><option>नेपाली</option></select></label>
+                </>
+              ) : (
+                <>
+                  <label>Enquiry type<select required name="enquiryType" disabled={loading}><option value="">Select</option><option>Strategic Investment</option><option>Institutional Partnership</option><option>Farmer Registration</option><option>Portfolio Proposal</option><option>Media Enquiry</option><option>General Contact</option></select></label>
+                  <label>Subject<input required name="subject" disabled={loading} /></label>
+                  <label className="wide">Message<textarea required name="message" rows={5} disabled={loading} /></label>
+                </>
+              )}
+            </div>
+            <label className="consent"><input type="checkbox" required disabled={loading} /> I consent to being contacted about this enquiry.</label>
+            <button
+              className="button"
+              type="submit"
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.6 : 1,
+                cursor: loading ? "not-allowed" : "pointer",
+                pointerEvents: loading ? "none" : "auto",
+              }}
+            >
+              {loading ? "Sending Enquiry..." : "Send Enquiry"} <ArrowRight />
+            </button>
+            <p className="note">Your information is transmitted securely and handled with strict confidentiality.</p>
+          </fieldset>
         </>
       )}
     </form>

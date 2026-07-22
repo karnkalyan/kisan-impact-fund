@@ -22,23 +22,10 @@ export async function POST(request: Request) {
       message,
     } = body;
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "mail.kisanimpactfund.com",
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: Number(process.env.SMTP_PORT) === 587 ? false : true,
-      auth: {
-        user: process.env.SMTP_USER || "inquiry@kisanimpactfund.com",
-        pass: process.env.SMTP_PASS || "@@inquiry@@impact",
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    });
-
     const isFarmerForm = Boolean(isFarmer);
     const mailSubject = isFarmerForm
       ? `[Farmer Registration] New interest submitted by ${name || "Farmer"}`
-      : `[${enquiryType || "General Contact"}] ${subject || "New Web Enquiry from " + name}`;
+      : `[${enquiryType || "General Contact"}] ${subject || "New Web Enquiry from " + (name || "Visitor")}`;
 
     let htmlContent = `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #172019; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">`;
     htmlContent += `<div style="background-color: #183d24; color: #ffffff; padding: 20px; text-align: center;"><h2 style="margin: 0; font-size: 20px;">Kisan Impact Fund</h2><p style="margin: 5px 0 0 0; font-size: 13px; color: #b4ea71;">New Contact Form Submission</p></div>`;
@@ -72,13 +59,53 @@ export async function POST(request: Request) {
 
     htmlContent += `</div><div style="background-color: #fafbf7; padding: 16px; text-align: center; border-top: 1px solid #e0e0e0; font-size: 12px; color: #738078;">Received via kisanimpactfund.com contact form</div></div>`;
 
-    await transporter.sendMail({
-      from: `"Kisan Impact Fund Enquiry" <inquiry@kisanimpactfund.com>`,
-      to: "info@kisanimpactfund.com",
-      replyTo: email || undefined,
-      subject: mailSubject,
-      html: htmlContent,
-    });
+    const user = process.env.SMTP_USER || "inquiry@kisanimpactfund.com";
+    const pass = process.env.SMTP_PASS || "@@inquiry@@impact";
+    const primaryHost = process.env.SMTP_HOST || "mail.kisanimpactfund.com";
+    const port = Number(process.env.SMTP_PORT) || 465;
+
+    // List of candidate SMTP configurations to attempt (Primary -> Localhost)
+    const configs = [
+      { host: primaryHost, port: port, secure: port === 465 },
+      { host: "127.0.0.1", port: port, secure: port === 465 },
+      { host: "127.0.0.1", port: 25, secure: false },
+    ];
+
+    let lastError: Error | null = null;
+    let sent = false;
+
+    for (const config of configs) {
+      try {
+        const transporter = nodemailer.createTransport({
+          host: config.host,
+          port: config.port,
+          secure: config.secure,
+          auth: { user, pass },
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 12000,
+          tls: { rejectUnauthorized: false },
+        });
+
+        await transporter.sendMail({
+          from: `"Kisan Impact Fund Enquiry" <${user}>`,
+          to: "info@kisanimpactfund.com",
+          replyTo: email || undefined,
+          subject: mailSubject,
+          html: htmlContent,
+        });
+
+        sent = true;
+        break;
+      } catch (err: any) {
+        console.warn(`SMTP send attempt failed for ${config.host}:${config.port}:`, err?.message);
+        lastError = err;
+      }
+    }
+
+    if (!sent) {
+      throw lastError || new Error("Failed to connect to SMTP server");
+    }
 
     return NextResponse.json({ success: true, message: "Enquiry submitted successfully" });
   } catch (error: any) {
